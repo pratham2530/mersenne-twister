@@ -17,6 +17,8 @@ The period of the generator is $2^{19937} - 1$; that is, the generator can gener
 
 The following implementation details are derived from the following video: [The Most Popular Pseudo-Random Number Generator - The Mersenne-Twister](https://www.youtube.com/watch?v=TF4PLUcJO5w).
 
+---
+
 ### Overview of the algorithm
 The Mersenne Twister (specifically MT19937) works by maintaining an internal state array of 624 32-bit unsigned integers. 
 
@@ -41,7 +43,9 @@ The algorithms consists of three phases:
 
     To ensure it passes empirical tests for true uniform randomness, the value is subjected to four bitwise tempering operations (using bitwise shifts `<<`, `>>`, bitwise AND `&` masks, and bitwise XOR `^`). 
     
-    Tempering breaks up small linear correlations between the numbers remaining after twisting. After this, the random 32-bit integer can be returned. 
+    Tempering breaks up small linear correlations between the numbers remaining after twisting. After this, the random 32-bit integer can be returned.
+
+---
 
 ## Class: MersenneTwister
 
@@ -162,6 +166,8 @@ However, there are three main differences:
 2. The Mersenne Twister needs a fixed array size (624 in this implementation), while a hash function compresses an input of any size into a fixed, small output.
 
 3. Cryptographic hash functions run data through multiple rounds of mixing and are therefore slower than Pseudo-Random Number Generators (PRNGs).
+
+---
 
 ### The mathematics behind the `twist()` method
 
