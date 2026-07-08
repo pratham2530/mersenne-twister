@@ -128,6 +128,8 @@ If random numbers between 0 and 1 can be generated, then to generate random numb
 ---
 
 ## Function: main()
+### Using a fixed seed value
+Assuming the interval and number of random numbers to return is fixed, if the seed value is also fixed the algorithm will return the same numbers if run again. This is helpful when generating data using random numbers and analysing the data since if another person were to run the simulation with a set seed value, the computations in the analysis will arrive to the same answer. 
 
 ### Generating a dynamic seed 
 #### Q: What is the OS kernel and how does it generate random numbers?
