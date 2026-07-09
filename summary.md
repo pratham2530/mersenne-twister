@@ -1,7 +1,7 @@
-# A mathematical summary of the mersenne twister
+# A mathematical summary of the Mersenne Twister (MT)
 
-# The Mersenne Twister
-Python implemented the Mersenne Twister algorithm in C to create the `random()` function. The standard implementation of the algorithm used is **MT19937**, which has a 32-bit word length. **MT** stands for Mersenne Twister and **19937** represents $2^{19937} - 1$ which is a Mersenne Prime and the period of the generator. 
+# Introduction
+Python implemented the MT in C to create the `random()` function. The standard implementation of the algorithm used is **MT19937**, which has a 32-bit word length. **19937** represents $2^{19937} - 1$ which is a Mersenne Prime and the period of the generator. 
 
 The following implementation details are derived from the following video: [The Most Popular Pseudo-Random Number Generator - The Mersenne-Twister](https://www.youtube.com/watch?v=TF4PLUcJO5w).
 
@@ -10,6 +10,8 @@ The following implementation details are derived from the following video: [The 
 ### Overview of the algorithm
 MT19937 works by maintaining an array of 624 32-bit unsigned integers called a state grid. A seed value is used to fill the state grid sequentially.
 
+Note that in the following "number", "integer", "element" and "cell" are often interchanged (although a cell is where an integer lives in). 
+
 There are three main phases: 
 1. **Initialisation (`state_grid`):** the state grid is filled using a linear recurrence relation. Bitwise operations are used to mix bits to ensure any single bit has an influence on other bits. For example, leftward bit shifts help small changes in the initial seed value to have a large changes in higher-order bits. 
 
@@ -17,34 +19,24 @@ There are three main phases:
 
 2. **Twisting (`twist`):** once the state grid is filled, the generator runs a twist on all the numbers. 
 
-    It iterates through the entire state array, combining the upper bits of one element with the lower bits of the next, multiplying by a specific transition matrix (Matrix $A$), and XORing it with an offset element ($i + 397$). 
-    
-    This helps to increase the influence of different bits on the whole 32-bit integer.
+    The upper bit of one element are concatenated with the lower bits of the next, "multiplied" by a transition matrix (matrix $A$) by bit-masking with `matrix_a`, and XORing with the offset element at position $i + 397$. This helps to increase the influence of different bits on the whole 32-bit integer.
 
-3. **Tempering and extraction (`extract_number`):** When a user requests a random number, the integer at the current index is extracted. 
+3. **Tempering and extraction (`extract_number`):** when a user requests a random number, the integer at the current index is extracted. 
 
-    To ensure it passes empirical tests for true uniform randomness, the value is subjected to four bitwise tempering operations (using bitwise shifts `<<`, `>>`, bitwise AND `&` masks, and bitwise XOR `^`). 
-    
-    Tempering breaks up small linear correlations between the numbers remaining after twisting. After this, the random 32-bit integer can be returned.
+    To ensure it passes empirical tests for true uniform randomness, four bitwise tempering operations (using bitwise shifts `<<`, `>>`, bitwise AND `&` masks, and bitwise XOR `^`) are applied to the twisted integer. Tempering breaks up small linear correlations between the numbers remaining after twisting.
 
 ---
 
 ## Class: MersenneTwister
 
 ### The state space
-The state grid is an array of 624 individual 32-bit cells. By running the `state_grid()` method, the seed populates the grid. These values are used in the `twist()` and `extract_number()` methods later in the algorithm.
+The state grid is an array of 624 individual 32-bit cells. Running the `state_grid()` method, the seed populates the grid and these values are used in the `twist()` and `extract_number()` methods later in the algorithm.
 
 #### Q: Why does the state have size 624?
-Since for a state of $k$ bits the absolute maximum number of unique states that can be cycled through before repeating is $2^k - 1$, the state must hold $19937$ bits of data. This follows from summing the geometric series:
-
-$$1 + 2 + \dots + 2^{k - 1} = 2^k - 1$$
-
-where $2^i$ represents the number of binary sequences of length $i$.
-
-To store this data in an array of 32-bit integers, $\lceil 19937 / 32 \rceil = 624$ integers are needed.
+For a state of $k$ bits the absolute maximum number of unique non-zero states that can be cycled through before repeating is $2^k - 1$. To store this data in an array of 32-bit integers, $\lceil 19937 / 32 \rceil = 624$ integers are needed.
 
 #### Q: What does pos_index do?
-When a number is extracted, `pos_index` is incremented by one so that a new random number is generated next time. `pos_index` refers to the index slot in the `self.state` array. When `pos_index` reaches 624, `twist()` is called to overwrite all 624 cells.
+When a number is extracted, `pos_index` is incremented by one so that a new random number is generated next time. `pos_index` reers to the index slot in the `self.state` array. When `pos_index` reaches 624, `twist()` is called to overwrite all 624 cells.
 
 ---
 
@@ -52,44 +44,42 @@ When a number is extracted, `pos_index` is incremented by one so that a new rand
 Populate the state grid using `seed_val`.
 
 #### Q: Where does the seeding multiplier come from?
-This initialising step relies on a Linear Congruential Generator (LCG). The formula used mathematically is:
+This initialising step relies on a Linear Congruential Generator (LCG). The formula used is:
 
 $$X_i = f \cdot (X_{i - 1} \oplus (X_{i - 1} \gg 30)) + i \pmod{2^{32}}$$
 
 *(where $\oplus$ is the bitwise XOR).*
 
-If a "bad" multiplier is chosen, the 624 numbers generated can appear related. Donald Knuth proved that the chosen multiplier can generate numbers which are spread out uniformly across the 32-bit space by passing the spectral test.
-
-Intuitively, when the 624 numbers are plotted as multi-dimensional coordinates, there are no evident geometric correlations such as a straight line.
+If a "bad" multiplier is chosen, the 624 numbers generated can appear related. Donald Knuth proved that the chosen multiplier can generate numbers which are spread out uniformly across the 32-bit space by passing the spectral test. Pictorally, when the 624 numbers are plotted in multi-dimensional coordinates, there are no evident geometric correlations such as a straight line.
 
 ---
 
 ### Method Reference: `twist()`
-'Twists' the entire state grid of 624 numbers into a new grid. This method simulates a Linear Feedback Shift Register (LFSR) optimised to run on 32-bit words. *(See the end of the document for a detailed explanation of the mathematics behind the algorithm).*
+'Twists' the entire state grid of 624 numbers to create a new grid of numbers. This method simulates a Linear Feedback Shift Register (LFSR) optimised to run on 32-bit words.
 
 #### Q: How does a LFSR usually work?
 A LFSR is a shift register whose input bit is a linear function of its previous state. For example, using the linear function XOR:
-1. **Register:** A sequence of bits ($[b_n, b_{n - 1}, \dots, b_1, b_0]$).
+1. **Register:** a sequence of bits ($[b_n, b_{n - 1}, \dots, b_1, b_0]$).
 
-2. **Taps:** Specific positions in the register.
+2. **Taps:** specific positions in the register.
 
 3. Bits are shifted right by 1 and the empty slot is filled by XORing the tapped bits.
 
-Since there are $2^n - 1$ non-zero states, the register will eventually repeat. If the taps are chosen using a primitive polynomial, the LFSR will achieve its maximum period of $2^n - 1$ before repeating.
+Since there are $2^n - 1$ non-zero states, the register will eventually repeat. If the taps are chosen using a primitive polynomial, the LFSR will achieve its maximum period of $2^n - 1$ before repeating *(See the "The maths behind the `twist()` method" for more).*
 
 #### Q: How does `twist()` generalise a LFSR?
-In order to ensure each individual cell does not act as an isolated generator, local and global boundary crossings are needed.
+In order to ensure each individual integer are not isolated, local and global boundary crossings are needed to introduce more randomness. Here local and global refer to the interaction of integers near and far away from each other in the state grid. 
 
 1. Slicing and concatenating adjacent words ensures information is coupled along the array boundaries.
 
-2. The conditional XOR with `matrix_a` represents multiplying a specialised transition matrix over $\mathbb{F}_2$. *(See the end of the file for a detailed explanation).* This step ensures the period of the generator remains the large Mersenne prime $2^{19937} - 1$.
+2. The conditional XOR with `matrix_a` represents multiplying a specialised transition matrix over $\mathbb{F}_2$. *(See the "The maths behind the `twist()` method" for more).*
 
-3. Mixing with a distant cell (397 positions away) ensures local patterns are erased, helping the algorithm pass the spectral test.
+3. Mixing with a cell 397 positions ahead adds a global boundary crossing and helps the algorithm pass the spectral test.
 
 ---
 
 ### Method Reference: `extract_number()`
-Extract the raw number from the current index, run it through 4 tempering operations, and increment the pointer.
+Extract the raw number from the current index, run it through four tempering operations, and increment the pointer.
 
 Tempering is the process of using binary operations such as bit-shifts (`<<`, `>>`), bitmasks (`&`), and XOR (`^`) to add further randomness.
 
@@ -106,60 +96,36 @@ Since $0 = 0 \oplus 0$ and $1 = 1 \oplus 0$, specific bits can be first shifted 
 
 ---
 
-## Class: Random
+### Cryptographic hashes vs. the MT
 
-### Method Reference: `gen_nums()`
-If random numbers between 0 and 1 can be generated, then to generate random numbers in the interval $[a, b]$, multiply each random number generated by $(b - a)$ and add $a$.
+Cryptographic hash functions and the MT both rely on **diffusion**: small changes in the input should lead to large changes in the output.
 
----
+In addition, both use bitwise operations including:
 
-## Function: main()
-### Using a fixed seed value
-Assuming the interval and number of random numbers to return is fixed, if the seed value is also fixed the algorithm will return the same numbers if run again. This is helpful when generating data using random numbers and analysing the data since if another person were to run the simulation with a set seed value, the computations in the analysis will arrive to the same answer. 
-
-### Generating a dynamic seed 
-#### Q: What is the OS kernel and how does it generate random numbers?
-The kernel makes decisions in the Operating System (OS) and is the first program to run when a computer is turned on. Applications make system calls to interact with the hardware through the kernel.
-
-The kernel keeps a running "entropy pool," which is a buffer in memory filled with hardware noise (e.g., exact timings of keyboard clicks). The raw hardware noise is passed through a cryptographic hash function which ensures each bit has an equal chance of being a 0 or a 1.
-
-The kernel uses the entropy pool to seed an internal generator (e.g., on Windows it is BCrypt). The number of bytes specified is sliced off the generated binary stream.
-
----
-
-### Cryptographic hashes vs. the mersenne twister
-
-Cryptographic hash functions and the Mersenne Twister algorithm both rely on **diffusion**: small changes in the input should lead to large changes in the output.
-
-In addition, both use binary operations including:
-
-1. `^` (XOR) to flip bits conditionally.
+1. `^` (XOR) to flip bits conditionally without clearing state
 
 2. `<<`, `>>` (Bit-shifts) to allow higher-order and lower-order bits to interact.
 
-3. `&` (Bitmasks) to isolate sections of binary sequences.
+3. `&` (Bitmasks) to isolate sections of the integer or introduce assymetric bit patterns. 
 
-4. Hexadecimal constants (e.g., multipliers) to increase chaos.
+However, there are three main system trade-offs: 
 
-However, there are three main differences:
+1. * The tempering operation in the MT is linear and invertible.
+   * Cryptographic hash functions use non-linear step functions and compression. 
 
-1. Operations in the Mersenne Twister are linear and invertible, while operations in cryptographic hash functions are non-linear; thus, information is lost.
+2. * The MT needs a fixed state array size. 
+   * A cryptographic hash accepts an arbitrary-length byte stream. 
 
-2. The Mersenne Twister needs a fixed array size (624 in this implementation), while a hash function compresses an input of any size into a fixed, small output.
-
-3. Cryptographic hash functions run data through multiple rounds of mixing and are therefore slower than Pseudo-Random Number Generators (PRNGs).
+4. * The MT relies on linear recurrences which is optimal for CPU execution loops making it useful for Monte-carlo simulations.
+   * Cryptographic hash functions use multiple rounds of mixing to increase security. 
 
 ---
 
-### The mathematics behind the `twist()` method
+### The maths behind the `twist()` method
 
 #### What is `matrix_a`?
 
-The matrix $A$ is a $32 \times 32$ square matrix where the matrix values are either 0 or 1, i.e. $A \in \mathbb{F}_2^{32 \times 32}$. This is different to `matrix_a` in the `twist()` method. 
-
-Addition within $\mathbb{F}&#95;2$ is calculated using the bitwise XOR ($\oplus$) operation since $1&#95;{\mathbb{F}} + 1&#95;{\mathbb{F}} = 0&#95;{\mathbb{F}}$.
-
-$A$ is the following matrix: 
+The matrix $A$ is a $32 \times 32$ square matrix where the matrix values are either 0 or 1 i.e. $A \in \mathbb{F}_2^{32 \times 32}$. *This is different to `matrix_a` in the `twist()` method.* Note addition within $\mathbb{F}&#95;2$ is calculated using the bitwise XOR ($\oplus$) operation since $1&#95;{\mathbb{F}} + 1&#95;{\mathbb{F}} = 0&#95;{\mathbb{F}}$. Also, 
 
 $$
 A = \begin{pmatrix} 
@@ -173,7 +139,7 @@ $$
 
 If $v = (v_{31}, v_{30}, \dots, v_0)$ is a row vector then $vA = (a_{31}v_{0}, v_{31} + a_{30}v_0, \dots, v_1 + a_0v_0)$. If $v_0 = 0$ then $vA = (0, v_{31}, \dots, v_1)$ is equivalent to the bit-wise shift `x_shift = x_comb >> 1`. 
 
-However, if $v_0 = 1$ then $vA = (a_{31}, v_{31} + a_{30}, \dots, v_1 + a_0) = (a_{31}, a_{30}, \dots, a_0) + (0, v_{31}, \dots, v_0)$ which is equivalent to `x_shift = (x_comb >> 1) ^ matrix_a`. Hence `matrix_a` is the last row vector in matrix $A$ (while this is a mathematically confusing name, I wanted to reference to matrix $A$). 
+However, if $v_0 = 1$ then $vA = (a_{31}, v_{31} + a_{30}, \dots, v_1 + a_0) = (a_{31}, a_{30}, \dots, a_0) + (0, v_{31}, \dots, v_0)$ which is equivalent to `x_shift = (x_comb >> 1) ^ matrix_a`. Hence `matrix_a` is the last row vector in matrix $A$ (this might be a confusing name). 
 
 In the final step of the `twist()` method, `x_shift` is mixed with a different state. In a traditional Generalised Feedback Shift Register (GFSR), the generator uses the following recurrence relation: 
 
@@ -185,7 +151,7 @@ This is equivalent to `self.state[i] = (self.state[(i + m) % self.n]) ^ (x_shift
 
 However, in a GFSR $A$ can be an arbitrary, dense (contain many 1s) matrix. Multiplying a 32-bit vector ($x_i$) by a dense matrix translates into 32 distinct bitwise shift-and-add (XOR) loop iterations. Repeating this 624 times is very slow. 
 
-The matrix $A$ in the Mersenne Twister is designed so matrix multiplication can be translated into 1 bitwise shift-and-add loop iteration which is processed by the CPU almost instantly. 
+The matrix $A$ in the MT is designed so matrix multiplication can be translated into 1 bitwise shift-and-add loop iteration which is processed by the CPU almost instantly. 
 
 #### Why is the period of each state $2^{19937} - 1$?
 
