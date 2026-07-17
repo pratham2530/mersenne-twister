@@ -10,7 +10,7 @@ Before updating the `Random` and `Test` classes, the generator failed several in
 
 3. Changing the denominator to $2^{32}$ instead of $2^{32} - 1$ in `gen_nums()` to output numbers in the $[0, 1)$ interval did not fix the results.
 4. A Kolmogorov-Smirnov (KS) test showed weak results ($D = 0.05$, $p = 0.08$).
-5. The 2D scatter plot showed clear line banding, meaning values were repeating.
+5. The 2D scatter plot showed clear bands and empty spaces implying values were repeating.
 
 ![](images/Figure_8.png)
 
