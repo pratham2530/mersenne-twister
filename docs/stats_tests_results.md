@@ -1,4 +1,4 @@
-# Notes on Writing Code, Mathematical Derivations and Test Results
+# Statistial test results of custom MT PRNG
 
 ## Changes while writing code:
 Before updating the `Random` and `Test` classes, the generator failed several initial tests:
