@@ -260,6 +260,6 @@ Hence, these 31 bits do not influence the system globally. Hence, the polynomial
 
 ##### Showing the characteristic polynomial is primitive
 
-Consider the (Galoid) field $F_{2^n}$. The size of the multiplicative group is $2^n - 1$ since $0$ is not invertible. By Lagrange's or Fermat's theorem, the order of any element must be $1$ or $2^n - 1$. Since $\lambda \neq 1$, it follows $\{1, \lambda, \lambda^2, \dots, \lambda^{2^{n} - 1}\}$ are distinct for $\lambda \neq 1$. 
+Consider the (Galois) field $F_{2^n}$. The size of the multiplicative group is $2^n - 1$ since $0$ is not invertible. By Lagrange's or Fermat's theorem, the order of any element must be $1$ or $2^n - 1$. Since $\lambda \neq 1$, it follows $\{1, \lambda, \lambda^2, \dots, \lambda^{2^{n} - 1}\}$ are distinct for $\lambda \neq 1$. 
 
 Remember $x_{i + 1} = \lambda x_i$ so for non-zero states, $\{x_0, \lambda x_0, \dots, \lambda^{2^{19937} - 1} x_0\}$ are the $2^{19937}$ different states each integer takes before repeating.
