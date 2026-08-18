@@ -265,9 +265,3 @@ class Tests:
                 plt.show(block=True)
             
             return float(slope)
-
-    empirical_slope = tests.check_convergence_rate(plot=if_plot)
-    print("  └─ Theoretical Convergence Slope: -0.500")
-    print(f"  └─ Empirical Convergence Slope: {empirical_slope:.4f}")
-
-    print("=" * 62)
