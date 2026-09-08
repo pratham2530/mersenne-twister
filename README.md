@@ -4,7 +4,7 @@ A python implementation of the **MT19937** PRNG used in Python's built-in `rando
 
 ## Why this exists
 
-I wanted to know how Python generates random numbers. In addition, this projcet contains a full write-up, [`summary.md`](./summary.md) covering *why* each step exists, the the linear algebra behind the `twist()` step and a derivation of the generator's period of $2^{19937} - 1$. In addition, there are statistical tests run on PRNG with a write-up `stats_test_results.md` covering more details on each test and results. 
+I wanted to know how Python generates random numbers. In addition, this project contains a full write-up, [`summary.md`](./summary.md) covering *why* each step exists, the linear algebra behind the `twist()` step and a derivation of the generator's period of $2^{19937} - 1$. In addition, there are statistical tests run on PRNG with a write-up `stats_test_results.md` covering more details on each test and results. 
 
 ## Features
 
@@ -13,7 +13,7 @@ I wanted to know how Python generates random numbers. In addition, this projcet 
 - Supports both a fixed default seed and a dynamically generated seed. 
 - Summary of the main concepts and maths behind the algorithm. 
 - Statistical validation of generator. 
-- Empirical results of statistical tests and additional mathematical backgroud.
+- Empirical results of statistical tests and additional mathematical background.
 
 Example plots from statistical tests: 
 
@@ -34,7 +34,7 @@ cd mersenne-twister
 ```python
 from tools import Random
 
-# defualt seed 
+# default seed 
 nums = Random(a=0, b=3, rand_nums=4).gen_nums()
 print(nums)
 
