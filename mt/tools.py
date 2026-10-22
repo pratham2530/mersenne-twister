@@ -99,7 +99,7 @@ class MersenneTwister:
 
 
 class Random:
-    def __init__(self, a: int, b: int, rand_nums: int, seed_val: int = 5489) -> None:
+    def __init__(self, a: int, b: int, rand_nums: int = 1, seed_val: int = 5489) -> None:
         """Initialise parameters to generate random numbers in the interval [a, b]. 
 
         Scales outputs from the interval [0, 1] into [a, b] using (val * (b - a)) + a.
