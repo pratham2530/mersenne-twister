@@ -24,15 +24,17 @@ class MersenneTwister:
 
         # update each cell in the state grid
         for i in range(1, self.n):
-            self.state[i] = (
-                self.state[i - 1]
-                ^ (
-                    self.state[i - 1]
-                     # isolate highest bits to influence lower-order bits
-                    >> 30        
-                )
+            self.state[i] = 
+            (
                 # cause large bit-shifts so next cells flip unpredictably
-                * f
+                f * (
+                self.state[i - 1]
+                    ^ (
+                        self.state[i - 1]
+                         # isolate highest bits to influence lower-order bits
+                        >> 30        
+                    )
+                )
                 # force next state to be non-zero if previous state is zero
                 + i                   
             ) & 0xFFFFFFFF
