@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 
-from tools import Random
+from mt.tools import Random
 
 
 class Tests: 
