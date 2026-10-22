@@ -60,5 +60,8 @@ def main():
     if_plot = True
     print(f"Monte Carlo Convergence Test: (plot: {if_plot})")
 
+    convergence_rate = tests.check_convergence_rate(plot=if_plot)
+    print(f"Convergence rate: {convergence_rate}")
+
 if __name__ == "__main__": 
   main()
