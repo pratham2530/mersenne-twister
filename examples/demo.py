@@ -1,4 +1,4 @@
-from tools import Random
+from mt.tools import Random
 
 
 def main():
