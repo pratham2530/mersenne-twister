@@ -24,20 +24,12 @@ class MersenneTwister:
 
         # update each cell in the state grid
         for i in range(1, self.n):
-            self.state[i] = 
-            (
-                # cause large bit-shifts so next cells flip unpredictably
-                f * (
-                self.state[i - 1]
-                    ^ (
-                        self.state[i - 1]
-                         # isolate highest bits to influence lower-order bits
-                        >> 30        
-                    )
-                )
-                # force next state to be non-zero if previous state is zero
-                + i                   
-            ) & 0xFFFFFFFF
+            prev = self.state[i - 1]
+            self.state[i] = (f * (prev ^ (prev >> 30)) + i) & 0xFFFFFFFF
+
+            # f: spreads each bit's influence into higher-order bits so next cells flip unpredictably
+            # prev >> 30: isolate highest bits to influence lower-order bits
+            # + i: force next state to be non-zero if previous state is zero
 
     def twist(self) -> None:
         """Apply the twist operation to the state grid. 
