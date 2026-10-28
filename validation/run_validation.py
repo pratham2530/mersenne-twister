@@ -1,4 +1,4 @@
-from stats_tests import Tests
+from validation.stats_tests import Tests
 
 
 def main():
