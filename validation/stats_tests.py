@@ -160,7 +160,7 @@ class Tests:
 
         # Two-tailed test: reject if too few or many runs. 
         p_value = 2 * (1 - stats.norm.cdf(np.abs(z_statistic)))
-        if_pass = p_value > alpha
+        if_pass = "ACCEPT" if p_value > alpha else "REJECT"
         
         return float(z_statistic), float(p_value), if_pass
 
@@ -264,4 +264,4 @@ class Tests:
             plt.legend()
             plt.show(block=True)
         
-        return float(slope)
+        return round(float(slope), 3)
