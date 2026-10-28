@@ -54,11 +54,15 @@ raw_ints = [mt.extract_number() for _ in range(5)]
 
 ### Running the demo
 
+Run from the project root (the `mersenne-twister` folder): 
+
 ```bash
 python -m examples.demo
 ```
 
 ### Running the validation
+
+Run from the project root: 
 
 ```bash
 python -m validation.run_validation
