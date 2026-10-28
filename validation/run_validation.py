@@ -21,7 +21,6 @@ def main():
     if_plot = False
     print(f"KS Tests for Chi-Squared p-values: (plot: {if_plot})")
 
-    ks_results = {}
     for num_trial in (100, 200, 500, 1000):
         ks_statistic, ks_p_value, if_pass = tests.chi_squared_p_value_dist(num_trials=num_trial, plot=if_plot)
         print(f"  └─ Trials: {num_trial:4d} | KS Statistic: {ks_statistic:.4f} | KS p-value: {ks_p_value:.4f} ({if_pass})")
@@ -38,11 +37,8 @@ def main():
     print("Serial Correlation Test:")
 
     lags, correlation_coefficients, max_corr, confidence_interval, if_pass = tests.serial_correlation()
-    for i in range(len(lags)): 
-        if correlation_coefficients[i] > 0: 
-            print(f"  └─ Lag: {lags[i]:4d}  | Correlation Coefficient: {correlation_coefficients[i]:+.4f}")
-        else: 
-            print(f"  └─ Lag: {lags[i]:4d}  | Correlation Coefficient: {correlation_coefficients[i]:+.4f}")
+    for lag, corr in zip(lags, correlation_coefficients): 
+        print(f"  └─ Lag: {lag:4d}  | Correlation Coefficient: {corr:+.4f}")
 
     print(f"\nMaximum Correlation: {max_corr:.4f} | Confidence Interval {confidence_interval:.4f} ({if_pass})")
 
