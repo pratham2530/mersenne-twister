@@ -4,7 +4,7 @@ A python implementation of the **MT19937** PRNG used in Python's built-in `rando
 
 ## Why this exists
 
-I wanted to know how Python generates random numbers. In addition, this project contains a full write-up, [`summary.md`](./summary.md) covering *why* each step exists, the linear algebra behind the `twist()` step and a derivation of the generator's period of $2^{19937} - 1$. In addition, there are statistical tests run on PRNG with a write-up `stats_test_results.md` covering more details on each test and results. 
+I wanted to know how Python generates random numbers. In addition, this project contains a full write-up, [`summary.md`](docs/summary.md) covering *why* each step exists, the linear algebra behind the `twist()` step and a derivation of the generator's period of $2^{19937} - 1$. In addition, there are statistical tests run on PRNG with a write-up `stats_test_results.md` covering more details on each test and results. 
 
 ## Features
 
@@ -22,7 +22,7 @@ Example plots from statistical tests:
 
 ## Installation
 
-No dependencies beyond the Python standard library.
+The generator only uses the Python standard library. The validation needs NumPy, SciPy and Matplotlib. 
 
 ```bash
 git clone https://github.com/pratham2530/mersenne-twister.git
@@ -32,7 +32,7 @@ cd mersenne-twister
 ## Usage
 
 ```python
-from tools import Random
+from mt.tools import Random
 
 # default seed 
 nums = Random(a=0, b=3, rand_nums=4).gen_nums()
@@ -46,23 +46,22 @@ print(nums)
 Use the `MersenneTwister` class directly for raw 32-bit integers: 
 
 ```python
-from tools import MersenneTwister
+from mt.tools import MersenneTwister
 
 mt = MersenneTwister(seed_val=5489)
-mt.twist()
 raw_ints = [mt.extract_number() for _ in range(5)]
 ```
 
 ### Running the demo
 
 ```bash
-python demo.py
+python -m examples.demo
 ```
 
 ### Running the validation
 
 ```bash
-python validation.py
+python -m validation.run_validation
 ```
 
 ## How it works
@@ -73,7 +72,7 @@ MT19937 generates numbers in three phases:
 2. **Twisting** (`twist`) - mixes the entire state grid using a linear feedback shift register-style transformation which runs every 624 numbers generated.
 3. **Tempering** (`extract_number`) - applies bitwise shifts, masks, and XORs to each output to remove residual linear correlations before returning it.
 
-For the full explanation see [`summary.md`](./summary.md).
+For the full explanation see [`summary.md`](docs/summary.md).
 
 ## Project structure
 
